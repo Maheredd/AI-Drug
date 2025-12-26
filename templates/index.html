@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drug-Target Interaction Predictor | AI-Powered Drug Discovery</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="hero-title">AI-Powered Drug-Target Interaction Prediction</h1>
+      <p class="hero-subtitle">Accelerate drug discovery with deep learning. Predict binding affinity between compounds and protein targets in seconds.</p>
+      <a href="#predictor" class="cta-btn">Try the Predictor <i class="fas fa-arrow-right"></i></a>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how-it-works" class="section-how">
+    <div class="container">
+      <h2 class="section-title">How It Works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-icon"><i class="fas fa-flask"></i></div>
+          <h3>1. Input Drug SMILES</h3>
+          <p>Enter the chemical structure in SMILES notation</p>
+        </div>
+        <div class="step">
+          <div class="step-icon"><i class="fas fa-dna"></i></div>
+          <h3>2. Input Protein Sequence</h3>
+          <p>Provide the amino acid sequence of your target protein</p>
+        </div>
+        <div class="step">
+          <div class="step-icon"><i class="fas fa-brain"></i></div>
+          <h3>3. AI Prediction</h3>
+          <p>Neural network analyzes molecular features and binding potential</p>
+        </div>
+        <div class="step">
+          <div class="step-icon"><i class="fas fa-chart-line"></i></div>
+          <h3>4. Get Results</h3>
+          <p>Receive binding probability, confidence scores, and detailed analysis</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Predictor Section -->
+  <section id="predictor" class="section-predictor">
+    <div class="container">
+      <h2 class="section-title">Drug-Target Interaction Predictor</h2>
+      
+      <div class="predictor-grid">
+        
+        <!-- Input Panel -->
+        <div class="input-panel card">
+          <h3><i class="fas fa-input-text"></i> Input Data</h3>
+          
+          <div class="input-group">
+            <label for="smiles">
+              <i class="fas fa-flask"></i> Drug SMILES String
+              <span class="tooltip" title="Simplified Molecular Input Line Entry System - text representation of chemical structure">ⓘ</span>
+            </label>
+            <textarea id="smiles" rows="3" placeholder="e.g., CC(=O)Oc1ccccc1C(=O)O (Aspirin)"></textarea>
+            <small class="helper-text">Paste the SMILES notation of your drug compound</small>
+          </div>
+
+          <div class="input-group">
+            <label for="protein">
+              <i class="fas fa-dna"></i> Protein Sequence
+              <span class="tooltip" title="Amino acid sequence of the target protein">ⓘ</span>
+            </label>
+            <textarea id="protein" rows="4" placeholder="e.g., MKVLWALLVTFLAGCQAKVE..."></textarea>
+            <small class="helper-text">Enter the amino acid sequence (single letter codes)</small>
+          </div>
+
+          <button id="predictBtn" class="predict-btn">
+            <i class="fas fa-magic"></i> Predict Interaction
+          </button>
+
+          <div class="examples">
+            <p><strong>Try Examples:</strong></p>
+            <button class="example-btn" onclick="loadExample1()">Aspirin + COX</button>
+            <button class="example-btn" onclick="loadExample2()">HIV Drug</button>
+            <button class="example-btn" onclick="loadExample3()">Cancer Drug</button>
+          </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="results-panel card">
+          <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Analyzing molecular interactions...</p>
+          </div>
+
+          <div id="results" class="hidden">
+            <h3><i class="fas fa-chart-bar"></i> Prediction Results</h3>
+            
+            <!-- Binding Probability Gauge -->
+            <div class="result-item featured">
+              <div class="gauge-container">
+                <svg class="gauge" viewBox="0 0 200 120">
+                  <path id="gauge-fill" class="gauge-fill" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#4CAF50" stroke-width="20" stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
+                </svg>
+                <div class="gauge-value" id="probabilityValue">0%</div>
+              </div>
+              <p class="result-label">Binding Probability</p>
+              <p class="result-desc">Likelihood that the drug binds to the target protein</p>
+            </div>
+
+            <!-- Binding Status -->
+            <div class="result-item">
+              <div class="status-badge" id="bindingBadge">
+                <i class="fas fa-circle"></i>
+                <span id="bindingStatus">Unknown</span>
+              </div>
+              <p class="result-label">Interaction Status</p>
+              <p class="result-desc">Binary classification: binding or non-binding</p>
+            </div>
+
+            <!-- Confidence Score -->
+            <div class="result-item">
+              <div class="confidence-bar">
+                <div class="confidence-fill" id="confidenceFill"></div>
+                <span class="confidence-text" id="confidenceText">0%</span>
+              </div>
+              <p class="result-label">Model Confidence</p>
+              <p class="result-desc">How certain the model is about this prediction</p>
+            </div>
+
+            <!-- Detailed Analysis -->
+            <div class="analysis-box">
+              <h4><i class="fas fa-microscope"></i> Detailed Analysis</h4>
+              <div class="analysis-grid">
+                <div class="analysis-item">
+                  <strong>Prediction Score:</strong>
+                  <span id="predScore">-</span>
+                </div>
+                <div class="analysis-item">
+                  <strong>pActivity Estimate:</strong>
+                  <span id="pActivity">-</span>
+                </div>
+                <div class="analysis-item">
+                  <strong>Estimated IC50:</strong>
+                  <span id="ic50">-</span>
+                </div>
+                <div class="analysis-item">
+                  <strong>Drug Suitability:</strong>
+                  <span id="suitability">-</span>
+                </div>
+              </div>
+              <p class="interpretation" id="interpretation"></p>
+            </div>
+          </div>
+
+          <div id="errorMsg" class="error-box hidden">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p id="errorText"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
